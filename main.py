@@ -121,10 +121,10 @@ height = 500
 screen = pygame.display.set_mode([width, height])
 
 # Generate 3D Perlin Noise
-size_x = 120
-size_y = 120
-size_z = 120
-fields = generate_perlin_noise_3d((size_x, size_y, size_z), (3, 3, 3))
+size_x = 100
+size_y = 100
+size_z = 100
+fields = generate_perlin_noise_3d((size_x, size_y, size_z), (5, 5, 5))
 
 # Convert to 0's and 1's
 for z_slice in fields:
@@ -141,41 +141,26 @@ for field in fields:
 	cells = []
 	for y,row in enumerate(field):
 		cells.append([])
+		for x,value in enumerate(row):
+			if x < len(row)-1 and y < len(field)-1:
+				corners = [row[x], row[x+1], field[y+1][x], field[y+1][x+1]]
+				cells[-1].append(corners)
 
-		# If we're on the last row, wrap around to the first
-		if y == size_y - 1:
-			for x,value in enumerate(row):
-				# If we're on the last column, wrap around to the first
-				if x == size_x - 1:
-					corners = [row[x], row[0], field[0][x], field[0][0]]
-				elif x == 0:
-					corners = [row[x], row[x+1], field[0][x], field[0][x+1]]
-				else:
-					corners = [row[x], row[x+1], field[0][x], field[0][x+1]]
-				cells[-1].append(corners)
-		else:
-			for x,value in enumerate(row):
-				# If we're on the last column, wrap around to the first
-				if x == size_x - 1:
-					corners = [row[x], row[0], field[y+1][x], field[y+1][0]]
-				elif x == 0:
-					corners = [row[x], row[x+1], field[y+1][x], field[y+1][x+1]]
-				else:
-					corners = [row[x], row[x+1], field[y+1][x], field[y+1][x+1]]
-				cells[-1].append(corners)
 	all_cells.append(cells)
 
-
+clock = pygame.time.Clock()
 running = True
+counter = 0
 index = 0
 while running:
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
 			running = False
 
+	clock.tick(60)
 	screen.fill((0, 0, 0))
 
-	for y,row in enumerate(all_cells[int(index / 10)]):
+	for y,row in enumerate(all_cells[index]):
 		for x,cell in enumerate(row):
 			draw_cell(
 				state=get_state(cell),
@@ -183,8 +168,8 @@ while running:
 				depth=int(index / 10)
 			)
 
-	index += 10
-	if index >= len(all_cells) * 10:
+	index += 1
+	if index >= len(all_cells):
 		index = 0
 
 	pygame.display.flip()
