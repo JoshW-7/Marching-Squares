@@ -121,10 +121,10 @@ height = 500
 screen = pygame.display.set_mode([width, height])
 
 # Generate 3D Perlin Noise
-size_x = 50
-size_y = 50
-size_z = 50
-fields = generate_perlin_noise_3d((size_x, size_y, size_z), (5, 5, 5))
+size_x = 120
+size_y = 120
+size_z = 120
+fields = generate_perlin_noise_3d((size_x, size_y, size_z), (3, 3, 3))
 
 # Convert to 0's and 1's
 for z_slice in fields:
@@ -134,7 +134,6 @@ for z_slice in fields:
 				row[i] = 0
 			else:
 				row[i] = 1
-
 
 # Create a matrix of cells, each of which constitutes a list of 4 values representing its corners
 all_cells = []
@@ -149,6 +148,8 @@ for field in fields:
 				# If we're on the last column, wrap around to the first
 				if x == size_x - 1:
 					corners = [row[x], row[0], field[0][x], field[0][0]]
+				elif x == 0:
+					corners = [row[x], row[x+1], field[0][x], field[0][x+1]]
 				else:
 					corners = [row[x], row[x+1], field[0][x], field[0][x+1]]
 				cells[-1].append(corners)
@@ -157,6 +158,8 @@ for field in fields:
 				# If we're on the last column, wrap around to the first
 				if x == size_x - 1:
 					corners = [row[x], row[0], field[y+1][x], field[y+1][0]]
+				elif x == 0:
+					corners = [row[x], row[x+1], field[y+1][x], field[y+1][x+1]]
 				else:
 					corners = [row[x], row[x+1], field[y+1][x], field[y+1][x+1]]
 				cells[-1].append(corners)
@@ -180,7 +183,7 @@ while running:
 				depth=int(index / 10)
 			)
 
-	index += 1.5
+	index += 10
 	if index >= len(all_cells) * 10:
 		index = 0
 
