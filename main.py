@@ -55,7 +55,13 @@ def get_state(cell):
 	return cell[0] * 8 + cell[1] * 4 + cell[3] * 2 + cell[2]
 
 
-def draw_cell(state=0, position=(0,0), color=(255, 255, 255)):
+def convert(value, threshold=0):
+	if value > threshold:
+		return 1
+	else:
+		return 0
+
+def draw_cell(state=0, position=(0,0), color=(255, 255, 255), value=0):
 	global view_x, view_y
 	lines = {
 		1: [
@@ -123,17 +129,20 @@ def draw_cell(state=0, position=(0,0), color=(255, 255, 255)):
 		15: ((-1, -1), (1, -1), (1, 1), (-1, 1)),
 	}.get(state)
 
+	offset_x = -2*value/width/size_x
+	offset_y = -2*value/height/size_y
+
 	if lines:
 		for line in lines:
 			start = [
-				int(view_x + position[0] + line[0][0]*width/size_x/2),
-				int(view_y + position[1] + line[0][1]*height/size_y/2)
+				int(view_x + position[0] + line[0][0]*width/size_x/2 + offset_x),
+				int(view_y + position[1] + line[0][1]*height/size_y/2 + offset_y)
 			]
 			end = [
-				int(view_x + position[0] + line[1][0]*width/size_x/2),
-				int(view_y + position[1] + line[1][1]*height/size_y/2)
+				int(view_x + position[0] + line[1][0]*width/size_x/2 + offset_x),
+				int(view_y + position[1] + line[1][1]*height/size_y/2 + offset_y)
 			]
-			pygame.draw.line(screen, (255, 255, 255), start, end, 6)
+			pygame.draw.line(screen, (255, 255, 255), start, end, 4)
 
 	if state == 0:
 		return
@@ -142,9 +151,10 @@ def draw_cell(state=0, position=(0,0), color=(255, 255, 255)):
 	points = []
 	for point in polygon:
 		points.append((
-			int(view_x + position[0] + point[0]*width/size_x/2),
-			int(view_y + position[1] + point[1]*height/size_y/2)
+			int(view_x + position[0] + point[0]*width/size_x/2 + offset_x),
+			int(view_y + position[1] + point[1]*height/size_y/2 + offset_y)
 		))
+
 	pygame.draw.polygon(screen, color, points)
 
 
@@ -160,17 +170,6 @@ size_y = 60
 size_z = 60
 fields = generate_perlin_noise_3d((size_x, size_y, size_z), (5, 5, 5))
 
-# Convert to 0's and 1's
-for z_slice in fields:
-	for y,row in enumerate(z_slice):
-		for x,value in enumerate(row):
-			if value < 0 or x == len(row)-1 or x == 0:
-				row[x] = 0
-			elif y == len(z_slice)-1 or y == 0:
-				row[x] = 0
-			else:
-				row[x] = 1
-
 # Create a matrix of cells, each of which constitutes a list of 4 values representing its corners
 all_cells = []
 for field in fields:
@@ -179,7 +178,11 @@ for field in fields:
 		cells.append([])
 		for x,value in enumerate(row):
 			if x < len(row)-1 and y < len(field)-1:
-				corners = [row[x], row[x+1], field[y+1][x], field[y+1][x+1]]
+				a = convert(row[x])
+				b = convert(row[x+1])
+				c = convert(field[y+1][x])
+				d = convert(field[y+1][x+1])
+				corners = [a, b, c, d]
 				cells[-1].append(corners)
 
 	all_cells.append(cells)
@@ -205,6 +208,7 @@ while running:
 				state=get_state(cell),
 				position=(int(width/size_x/2 + x*width/size_x), int(height/size_y/2 + y*height/size_y)),
 				color=colors[index].rgb,
+				value=fields[index][y][x],
 			)
 
 	index += 1
