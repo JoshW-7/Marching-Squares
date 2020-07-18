@@ -1,6 +1,6 @@
 # Marching-Squares
 
-Example when run: 
+Example: 
 
 ![](example.gif)
 
