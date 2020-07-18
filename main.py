@@ -2,6 +2,8 @@ import noise
 import numpy as np
 import pygame
 
+from colour import Color
+
 
 # Function code from https://github.com/pvigier/perlin-numpy
 def generate_perlin_noise_3d(shape, res):
@@ -53,7 +55,7 @@ def get_state(cell):
 	return cell[0] * 8 + cell[1] * 4 + cell[3] * 2 + cell[2]
 
 
-def draw_cell(state=0, position=(0,0), depth=0):
+def draw_cell(state=0, position=(0,0), color=(255, 255, 255)):
 	lines = {
 		1: [
 			((-1, 0), (0, 1))
@@ -101,6 +103,25 @@ def draw_cell(state=0, position=(0,0), depth=0):
 		],
 	}.get(state)
 
+	polygon = {
+		0: ((-1, -1), (1, -1), (1, 1), (-1, 1)),
+		1: ((-1, 0), (-1, 1), (0, 1)),
+		2: ((1, 0), (0, 1), (1, 1)),
+		3: ((-1, 0), (1, 0), (1, 1), (-1, 1)),
+		4: ((0, -1), (1, -1), (1, 0)),
+		5: ((-1, 0), (0, -1), (1, -1), (1, 0), (0, 1), (-1, 1)),
+		6: ((0, -1), (1, -1), (1, 1), (0, 1)),
+		7: ((-1, 0), (0, -1), (1, -1), (1, 1), (-1, 1)),
+		8: ((-1, 0), (-1, -1), (0, -1)),
+		9: ((-1, -1), (0, -1), (0, 1), (-1, 1)),
+		10: ((-1, -1), (0, -1), (1, 0), (1, 1), (0, 1), (-1, 0)),
+		11: ((-1, -1), (0, -1), (1, 0), (1, 1), (-1, 1)),
+		12: ((-1, -1), (1, -1), (1, 0), (-1, 0)),
+		13: ((-1, -1), (1, -1), (1, 0), (0, 1), (-1, 1)),
+		14: ((-1, -1), (1, -1), (1, 1), (0, 1), (-1, 0)),
+		15: ((-1, -1), (1, -1), (1, 1), (-1, 1)),
+	}.get(state)
+
 	if lines:
 		for line in lines:
 			start = [
@@ -111,7 +132,19 @@ def draw_cell(state=0, position=(0,0), depth=0):
 				int(position[0] + line[1][0]*width/size_x/2),
 				int(position[1] + line[1][1]*height/size_y/2)
 			]
-			pygame.draw.line(screen, (0, 255, 125), start, end, 2)
+			#pygame.draw.line(screen, (0, 255, 125), start, end, 2)
+
+	if state == 0:
+		return
+
+	color = (int(color[0] * 255), int(color[1] * 255), int(color[2] * 255))
+	points = []
+	for point in polygon:
+		points.append((
+			int(position[0] + point[0]*width/size_x/2),
+			int(position[1] + point[1]*height/size_y/2)
+		))
+	pygame.draw.polygon(screen, color, points)
 
 
 # Initialization
@@ -121,10 +154,10 @@ height = 500
 screen = pygame.display.set_mode([width, height])
 
 # Generate 3D Perlin Noise
-size_x = 100
-size_y = 100
-size_z = 100
-fields = generate_perlin_noise_3d((size_x, size_y, size_z), (5, 5, 5))
+size_x = 60
+size_y = 60
+size_z = 60
+fields = generate_perlin_noise_3d((size_x, size_y, size_z), (6, 6, 6))
 
 # Convert to 0's and 1's
 for z_slice in fields:
@@ -148,6 +181,7 @@ for field in fields:
 
 	all_cells.append(cells)
 
+colors = list(Color("red").range_to(Color("blue"), size_z))
 clock = pygame.time.Clock()
 running = True
 counter = 0
@@ -157,7 +191,7 @@ while running:
 		if event.type == pygame.QUIT:
 			running = False
 
-	clock.tick(60)
+	clock.tick(30)
 	screen.fill((0, 0, 0))
 
 	for y,row in enumerate(all_cells[index]):
@@ -165,7 +199,7 @@ while running:
 			draw_cell(
 				state=get_state(cell),
 				position=(int(width/size_x/2 + x*width/size_x), int(height/size_y/2 + y*height/size_y)),
-				depth=int(index / 10)
+				color=colors[index].rgb,
 			)
 
 	index += 1
