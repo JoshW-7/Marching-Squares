@@ -56,6 +56,7 @@ def get_state(cell):
 
 
 def draw_cell(state=0, position=(0,0), color=(255, 255, 255)):
+	global view_x, view_y
 	lines = {
 		1: [
 			((-1, 0), (0, 1))
@@ -125,14 +126,14 @@ def draw_cell(state=0, position=(0,0), color=(255, 255, 255)):
 	if lines:
 		for line in lines:
 			start = [
-				int(position[0] + line[0][0]*width/size_x/2),
-				int(position[1] + line[0][1]*height/size_y/2)
+				int(view_x + position[0] + line[0][0]*width/size_x/2),
+				int(view_y + position[1] + line[0][1]*height/size_y/2)
 			]
 			end = [
-				int(position[0] + line[1][0]*width/size_x/2),
-				int(position[1] + line[1][1]*height/size_y/2)
+				int(view_x + position[0] + line[1][0]*width/size_x/2),
+				int(view_y + position[1] + line[1][1]*height/size_y/2)
 			]
-			#pygame.draw.line(screen, (0, 255, 125), start, end, 2)
+			pygame.draw.line(screen, (255, 255, 255), start, end, 6)
 
 	if state == 0:
 		return
@@ -141,8 +142,8 @@ def draw_cell(state=0, position=(0,0), color=(255, 255, 255)):
 	points = []
 	for point in polygon:
 		points.append((
-			int(position[0] + point[0]*width/size_x/2),
-			int(position[1] + point[1]*height/size_y/2)
+			int(view_x + position[0] + point[0]*width/size_x/2),
+			int(view_y + position[1] + point[1]*height/size_y/2)
 		))
 	pygame.draw.polygon(screen, color, points)
 
@@ -157,16 +158,18 @@ screen = pygame.display.set_mode([width, height])
 size_x = 60
 size_y = 60
 size_z = 60
-fields = generate_perlin_noise_3d((size_x, size_y, size_z), (6, 6, 6))
+fields = generate_perlin_noise_3d((size_x, size_y, size_z), (5, 5, 5))
 
 # Convert to 0's and 1's
 for z_slice in fields:
-	for row in z_slice:
-		for i,value in enumerate(row):
-			if value < 0:
-				row[i] = 0
+	for y,row in enumerate(z_slice):
+		for x,value in enumerate(row):
+			if value < 0 or x == len(row)-1 or x == 0:
+				row[x] = 0
+			elif y == len(z_slice)-1 or y == 0:
+				row[x] = 0
 			else:
-				row[i] = 1
+				row[x] = 1
 
 # Create a matrix of cells, each of which constitutes a list of 4 values representing its corners
 all_cells = []
@@ -181,6 +184,8 @@ for field in fields:
 
 	all_cells.append(cells)
 
+view_x = size_x / 16
+view_y = size_y / 16
 colors = list(Color("red").range_to(Color("blue"), size_z))
 clock = pygame.time.Clock()
 running = True
