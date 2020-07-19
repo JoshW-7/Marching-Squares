@@ -52,14 +52,15 @@ def generate_perlin_noise_3d(shape, res):
 
 
 def get_state(cell):
-	return cell[0] * 8 + cell[1] * 4 + cell[3] * 2 + cell[2]
+	return cell[0] * 8 + cell[1] * 4 + cell[2] * 2 + cell[3]
 
 
-def convert(value, threshold=0):
+def convert(value, threshold=0.2):
 	if value > threshold:
 		return 1
 	else:
 		return 0
+
 
 def draw_cell(state=0, position=(0,0), color=(255, 255, 255), value=0):
 	global view_x, view_y
@@ -129,18 +130,18 @@ def draw_cell(state=0, position=(0,0), color=(255, 255, 255), value=0):
 		15: ((-1, -1), (1, -1), (1, 1), (-1, 1)),
 	}.get(state)
 
-	offset_x = -2*value/width/size_x
-	offset_y = -2*value/height/size_y
+	# offset_x = -2*value/width/size_x
+	# offset_y = -2*value/height/size_y
 
 	if lines:
 		for line in lines:
 			start = [
-				int(view_x + position[0] + line[0][0]*width/size_x/2 + offset_x),
-				int(view_y + position[1] + line[0][1]*height/size_y/2 + offset_y)
+				int(view_x + position[0] + line[0][0]*width/size_x/2),
+				int(view_y + position[1] + line[0][1]*height/size_y/2)
 			]
 			end = [
-				int(view_x + position[0] + line[1][0]*width/size_x/2 + offset_x),
-				int(view_y + position[1] + line[1][1]*height/size_y/2 + offset_y)
+				int(view_x + position[0] + line[1][0]*width/size_x/2),
+				int(view_y + position[1] + line[1][1]*height/size_y/2)
 			]
 			pygame.draw.line(screen, (255, 255, 255), start, end, 4)
 
@@ -151,8 +152,8 @@ def draw_cell(state=0, position=(0,0), color=(255, 255, 255), value=0):
 	points = []
 	for point in polygon:
 		points.append((
-			int(view_x + position[0] + point[0]*width/size_x/2 + offset_x),
-			int(view_y + position[1] + point[1]*height/size_y/2 + offset_y)
+			int(view_x + position[0] + point[0]*width/size_x/2),
+			int(view_y + position[1] + point[1]*height/size_y/2)
 		))
 
 	pygame.draw.polygon(screen, color, points)
@@ -178,12 +179,12 @@ for field in fields:
 		cells.append([])
 		for x,value in enumerate(row):
 			if x < len(row)-1 and y < len(field)-1:
-				a = convert(row[x])
-				b = convert(row[x+1])
-				c = convert(field[y+1][x])
-				d = convert(field[y+1][x+1])
-				corners = [a, b, c, d]
-				cells[-1].append(corners)
+				cells[-1].append([
+					convert(row[x]),
+					convert(row[x+1]),
+					convert(field[y+1][x+1]),
+					convert(field[y+1][x]),
+				])
 
 	all_cells.append(cells)
 
