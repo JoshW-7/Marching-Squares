@@ -65,6 +65,7 @@ def convert(value, threshold=0.2):
 def draw_cell(cell=[0, 0, 0, 0], position=(0, 0), color=(255, 255, 255), threshold=0):
 	global view_x, view_y
 
+	# Get the state of this cell by passing in 1's or 0's for each corner
 	state = get_state([
 		convert(cell[0], threshold=threshold),
 		convert(cell[1], threshold=threshold),
@@ -72,55 +73,56 @@ def draw_cell(cell=[0, 0, 0, 0], position=(0, 0), color=(255, 255, 255), thresho
 		convert(cell[3], threshold=threshold)
 	])
 
+	# Get the lines to be drawn for this cell based on state
 	lines = {
-		1: [
-			((-1, 0), (0, 1))
-		],
-		2: [
-			((0, 1), (1, 0))
-		],
-		3: [
-			((-1, 0), (1, 0))
-		],
-		4: [
-			((0, -1), (1, 0))
-		],
-		5: [
-			((-1, 0), (0, -1)),
-			((0, 1), (1, 0))
-		],
-		6: [
-			((0, -1), (0, 1))
-		],
-		7: [
-			((-1, 0), (0, -1))
-		],
-		8: [
-			((-1, 0), (0, -1))
-		],
-		9: [
-			((0, -1), (0, 1))
-		],
-		10: [
+		1: (
 			((-1, 0), (0, 1)),
-			((0, -1), (1, 0))
-		],
-		11: [
-			((0, -1), (1, 0))
-		],
-		12: [
-			((-1, 0), (1, 0))
-		],
-		13: [
-			((0, 1), (1, 0))
-		],
-		14: [
-			((-1, 0), (0, 1))
-		],
-	}.get(state, [])
+		),
+		2: (
+			((0, 1), (1, 0)),
+		),
+		3: (
+			((-1, 0), (1, 0)),
+		),
+		4: (
+			((0, -1), (1, 0)),
+		),
+		5: (
+			((-1, 0), (0, -1)),
+			((0, 1), (1, 0)),
+		),
+		6: (
+			((0, -1), (0, 1)),
+		),
+		7: (
+			((-1, 0), (0, -1)),
+		),
+		8: (
+			((-1, 0), (0, -1)),
+		),
+		9: (
+			((0, -1), (0, 1)),
+		),
+		10: (
+			((-1, 0), (0, 1)),
+			((0, -1), (1, 0)),
+		),
+		11: (
+			((0, -1), (1, 0)),
+		),
+		12: (
+			((-1, 0), (1, 0)),
+		),
+		13: (
+			((0, 1), (1, 0)),
+		),
+		14: (
+			((-1, 0), (0, 1)),
+		),
+	}.get(state, ())
 
+	# Get the vertices for the polygon to be filled based on state
 	polygon = {
-		0: ((-1, -1), (1, -1), (1, 1), (-1, 1)),
 		1: ((-1, 0), (-1, 1), (0, 1)),
 		2: ((1, 0), (0, 1), (1, 1)),
 		3: ((-1, 0), (1, 0), (1, 1), (-1, 1)),
@@ -153,18 +155,13 @@ def draw_cell(cell=[0, 0, 0, 0], position=(0, 0), color=(255, 255, 255), thresho
 		]
 		pygame.draw.line(screen, (255, 255, 255), start, end, 4)
 
-	# Don't draw polygons for state 0
-	if state == 0:
-		return
-
 	# Fill in the solid area of this cell
-	points = []
-	for point in polygon:
-		points.append((
-			int(view_x + position[0] + point[0]*x_offset),
-			int(view_y + position[1] + point[1]*y_offset)
-		))
-	pygame.draw.polygon(screen, color, points)
+	points = [[
+		int(view_x + position[0] + point[0]*x_offset),
+		int(view_y + position[1] + point[1]*y_offset)
+	] for point in polygon]
+	if len(points) > 0:
+		pygame.draw.polygon(screen, color, points)
 
 
 # Initialization
@@ -174,13 +171,13 @@ height = 500
 screen = pygame.display.set_mode([width, height])
 
 # Options
-size_x = 50
-size_y = 50
-size_z = 50
+size_x = 60
+size_y = 60
+size_z = 60
 threshold = 0
 
 # Generate 3D Perlin Noise
-fields = generate_perlin_noise_3d((size_x, size_y, size_z), (5, 5, 5))
+fields = generate_perlin_noise_3d((size_x, size_y, size_z), (2, 2, 2))
 
 view_x = 0
 view_y = 0
@@ -203,8 +200,8 @@ while running:
 	# Draw a black background
 	screen.fill((0, 0, 0))
 
-	# Deform terrain on mouse over
 	"""
+	# Deform terrain on mouse over
 	mouse_x, mouse_y = pygame.mouse.get_pos()
 	grid_x = int(mouse_x / (width / size_x))
 	grid_y = int(mouse_y / (height / size_y))
