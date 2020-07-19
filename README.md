@@ -24,4 +24,6 @@ Also...I can't help but think of this simulation of quantum fluctuations after s
 
 ![](quantum_fluctuations.gif)
 
+*puts on "reality is a simulation" hat*
+
 https://en.wikipedia.org/wiki/Quantum_fluctuation
