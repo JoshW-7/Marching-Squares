@@ -2,6 +2,7 @@ import noise
 import numpy as np
 import pygame
 
+from numpy import interp
 from colour import Color
 
 
@@ -75,51 +76,51 @@ def draw_cell(cell=[0, 0, 0, 0], position=(0, 0), color=(255, 255, 255), thresho
 
 	# Get the lines to be drawn for this cell based on state
 	lines = {
-		1: (
-			((-1, 0), (0, 1)),
-		),
-		2: (
-			((0, 1), (1, 0)),
-		),
-		3: (
-			((-1, 0), (1, 0)),
-		),
-		4: (
-			((0, -1), (1, 0)),
-		),
-		5: (
-			((-1, 0), (0, -1)),
-			((0, 1), (1, 0)),
-		),
-		6: (
-			((0, -1), (0, 1)),
-		),
-		7: (
-			((-1, 0), (0, -1)),
-		),
-		8: (
-			((-1, 0), (0, -1)),
-		),
-		9: (
-			((0, -1), (0, 1)),
-		),
-		10: (
-			((-1, 0), (0, 1)),
-			((0, -1), (1, 0)),
-		),
-		11: (
-			((0, -1), (1, 0)),
-		),
-		12: (
-			((-1, 0), (1, 0)),
-		),
-		13: (
-			((0, 1), (1, 0)),
-		),
-		14: (
-			((-1, 0), (0, 1)),
-		),
-	}.get(state, ())
+		1: [
+			[(-1, 0), (0, 1)],
+		],
+		2: [
+			[(0, 1), (1, 0)],
+		],
+		3: [
+			[(-1, 0), (1, 0)],
+		],
+		4: [
+			[(0, -1), (1, 0)],
+		],
+		5: [
+			[(-1, 0), (0, -1)],
+			[(0, 1), (1, 0)],
+		],
+		6: [
+			[(0, -1), (0, 1)],
+		],
+		7: [
+			[(-1, 0), (0, -1)],
+		],
+		8: [
+			[(-1, 0), (0, -1)],
+		],
+		9: [
+			[(0, -1), (0, 1)],
+		],
+		10: [
+			[(-1, 0), (0, 1)],
+			[(0, -1), (1, 0)],
+		],
+		11: [
+			[(0, -1), (1, 0)],
+		],
+		12: [
+			[(-1, 0), (1, 0)],
+		],
+		13: [
+			[(0, 1), (1, 0)],
+		],
+		14: [
+			[(-1, 0), (0, 1)],
+		],
+	}.get(state, [])
 
 	# Get the vertices for the polygon to be filled based on state
 	polygon = {
@@ -144,7 +145,47 @@ def draw_cell(cell=[0, 0, 0, 0], position=(0, 0), color=(255, 255, 255), thresho
 	y_offset = height/size_y/2
 
 	# Draw the border for this cell
-	for line in lines:
+	for i,line in enumerate(lines):
+		"""
+		for n,point in enumerate(line):
+			offset = {
+				(-1, 0): (
+					0,
+					interp(cell[0] + (cell[3]-cell[0])/2, [cell[0], cell[3]], [-1, 1]),
+				),
+				(-1, -1): (
+					interp(cell[0] + (cell[1]-cell[0])/2, [cell[0], cell[1]], [-1, 1]),
+					interp(cell[0] + (cell[3]-cell[0])/2, [cell[0], cell[3]], [-1, 1])
+				),
+				(0, -1): (
+					interp(cell[0] + (cell[1]-cell[0])/2, [cell[0], cell[1]], [-1, 1]),
+					0,
+				),
+				(1, -1): (
+					interp(cell[0] + (cell[1]-cell[0])/2, [cell[0], cell[1]], [-1, 1]),
+					interp(cell[1] + (cell[2]-cell[1])/2, [cell[1], cell[2]], [-1, 1])
+				),
+				(1, 0): (
+					0,
+					interp(cell[1] + (cell[2]-cell[1])/2, [cell[1], cell[2]], [-1, 1]),
+				),
+				(1, 1): (
+					interp(cell[2] + (cell[3]-cell[2])/2, [cell[2], cell[3]], [-1, 1]),
+					interp(cell[1] + (cell[2]-cell[1])/2, [cell[1], cell[2]], [-1, 1])
+				),
+				(0, 1): (
+					interp(cell[2] + (cell[3]-cell[2])/2, [cell[2], cell[3]], [-1, 1]),
+					0,
+				),
+				(-1, 1): (
+					interp(cell[2] + (cell[3]-cell[2])/2, [cell[2], cell[3]], [-1, 1]),
+					interp(cell[1] + (cell[2]-cell[1])/2, [cell[1], cell[2]], [-1, 1])
+				),
+			}.get(point)
+
+			line[i] = (point[0] + offset[0], point[1] + offset[1])
+		"""
+
 		start = [
 			int(view_x + position[0] + line[0][0]*x_offset),
 			int(view_y + position[1] + line[0][1]*y_offset)
@@ -171,9 +212,9 @@ height = 500
 screen = pygame.display.set_mode([width, height])
 
 # Options
-size_x = 60
-size_y = 60
-size_z = 60
+size_x = 50
+size_y = 50
+size_z = 50
 threshold = 0
 
 # Generate 3D Perlin Noise
