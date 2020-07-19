@@ -20,7 +20,7 @@ And here's some terrain deformation. I think making a snake-type game out of thi
 
 ![](example_terrain_deformation.gif)
 
-Also...I can't help but think of this simulation of quantum fluctuations after staring at these for a while. So here it is:
+Also...I can't help but think of this simulation of quantum fluctuations after staring at these for a while. So here it is (I didn't make it):
 
 ![](quantum_fluctuations.gif)
 
