@@ -1,5 +1,9 @@
 # Marching-Squares
 
+Playing with colors:
+
+![](example_pretty.gif)
+
 Example with even distribution threshold (0.0): 
 
 ![](example.gif)
