@@ -55,15 +55,18 @@ def get_state(cell):
 	return cell[0] * 8 + cell[1] * 4 + cell[2] * 2 + cell[3]
 
 
-def convert(value, threshold=-0.2):
+def convert(value, threshold=0.2):
 	if value > threshold:
 		return 1
 	else:
 		return 0
 
 
-def draw_cell(state=0, position=(0,0), color=(255, 255, 255), value=0):
+def draw_cell(cell=[0, 0, 0, 0], position=(0, 0), color=(255, 255, 255), threshold=0):
 	global view_x, view_y
+
+	state = get_state(cell)
+
 	lines = {
 		1: [
 			((-1, 0), (0, 1))
@@ -130,9 +133,6 @@ def draw_cell(state=0, position=(0,0), color=(255, 255, 255), value=0):
 		15: ((-1, -1), (1, -1), (1, 1), (-1, 1)),
 	}.get(state)
 
-	# offset_x = -2*value/width/size_x
-	# offset_y = -2*value/height/size_y
-
 	if lines:
 		for line in lines:
 			start = [
@@ -155,7 +155,6 @@ def draw_cell(state=0, position=(0,0), color=(255, 255, 255), value=0):
 			int(view_x + position[0] + point[0]*width/size_x/2),
 			int(view_y + position[1] + point[1]*height/size_y/2)
 		))
-
 	pygame.draw.polygon(screen, color, points)
 
 
@@ -165,10 +164,13 @@ width = 500
 height = 500
 screen = pygame.display.set_mode([width, height])
 
-# Generate 3D Perlin Noise
+# Options
 size_x = 60
 size_y = 60
 size_z = 60
+threshold = 0.2
+
+# Generate 3D Perlin Noise
 fields = generate_perlin_noise_3d((size_x, size_y, size_z), (5, 5, 5))
 
 # Create a matrix of cells, each of which constitutes a list of 4 values representing its corners
@@ -180,10 +182,10 @@ for field in fields:
 		for x,value in enumerate(row):
 			if x < len(row)-1 and y < len(field)-1:
 				cells[-1].append([
-					convert(row[x]),
-					convert(row[x+1]),
-					convert(field[y+1][x+1]),
-					convert(field[y+1][x]),
+					convert(row[x], threshold=threshold),
+					convert(row[x+1], threshold=threshold),
+					convert(field[y+1][x+1], threshold=threshold),
+					convert(field[y+1][x], threshold=threshold),
 				])
 
 	all_cells.append(cells)
@@ -206,10 +208,9 @@ while running:
 	for y,row in enumerate(all_cells[index]):
 		for x,cell in enumerate(row):
 			draw_cell(
-				state=get_state(cell),
+				cell=cell,
 				position=(int(width/size_x/2 + x*width/size_x), int(height/size_y/2 + y*height/size_y)),
-				color=colors[index].rgb,
-				value=fields[index][y][x],
+				color=colors[index].rgb
 			)
 
 	index += 1
