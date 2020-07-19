@@ -112,7 +112,7 @@ def draw_cell(cell=[0, 0, 0, 0], position=(0, 0), color=(255, 255, 255), thresho
 		14: [
 			((-1, 0), (0, 1))
 		],
-	}.get(state)
+	}.get(state, [])
 
 	polygon = {
 		0: ((-1, -1), (1, -1), (1, 1), (-1, 1)),
@@ -131,29 +131,33 @@ def draw_cell(cell=[0, 0, 0, 0], position=(0, 0), color=(255, 255, 255), thresho
 		13: ((-1, -1), (1, -1), (1, 0), (0, 1), (-1, 1)),
 		14: ((-1, -1), (1, -1), (1, 1), (0, 1), (-1, 0)),
 		15: ((-1, -1), (1, -1), (1, 1), (-1, 1)),
-	}.get(state)
+	}.get(state, ())
+	
+	x_offset = width/size_x/2
+	y_offset = height/size_y/2
 
-	if lines:
-		for line in lines:
-			start = [
-				int(view_x + position[0] + line[0][0]*width/size_x/2),
-				int(view_y + position[1] + line[0][1]*height/size_y/2)
-			]
-			end = [
-				int(view_x + position[0] + line[1][0]*width/size_x/2),
-				int(view_y + position[1] + line[1][1]*height/size_y/2)
-			]
-			pygame.draw.line(screen, (255, 255, 255), start, end, 4)
+	# Draw the border for this cell
+	for line in lines:
+		start = [
+			int(view_x + position[0] + line[0][0]*x_offset),
+			int(view_y + position[1] + line[0][1]*y_offset)
+		]
+		end = [
+			int(view_x + position[0] + line[1][0]*x_offset),
+			int(view_y + position[1] + line[1][1]*y_offset)
+		]
+		pygame.draw.line(screen, (255, 255, 255), start, end, 4)
 
+	# Don't draw polygons for state 0
 	if state == 0:
 		return
 
-	color = (int(color[0] * 255), int(color[1] * 255), int(color[2] * 255))
+	# Fill in the solid area of this cell
 	points = []
 	for point in polygon:
 		points.append((
-			int(view_x + position[0] + point[0]*width/size_x/2),
-			int(view_y + position[1] + point[1]*height/size_y/2)
+			int(view_x + position[0] + point[0]*x_offset),
+			int(view_y + position[1] + point[1]*y_offset)
 		))
 	pygame.draw.polygon(screen, color, points)
 
@@ -165,33 +169,16 @@ height = 500
 screen = pygame.display.set_mode([width, height])
 
 # Options
-size_x = 60
-size_y = 60
-size_z = 60
-threshold = 0.2
+size_x = 100
+size_y = 100
+size_z = 100
+threshold = 0
 
 # Generate 3D Perlin Noise
 fields = generate_perlin_noise_3d((size_x, size_y, size_z), (5, 5, 5))
 
-# Create a matrix of cells, each of which constitutes a list of 4 values representing its corners
-all_cells = []
-for field in fields:
-	cells = []
-	for y,row in enumerate(field):
-		cells.append([])
-		for x,value in enumerate(row):
-			if x < len(row)-1 and y < len(field)-1:
-				cells[-1].append([
-					convert(row[x], threshold=threshold),
-					convert(row[x+1], threshold=threshold),
-					convert(field[y+1][x+1], threshold=threshold),
-					convert(field[y+1][x], threshold=threshold),
-				])
-
-	all_cells.append(cells)
-
-view_x = size_x / 16
-view_y = size_y / 16
+view_x = 0
+view_y = 0
 colors = list(Color("red").range_to(Color("blue"), size_z))
 clock = pygame.time.Clock()
 running = True
@@ -202,19 +189,36 @@ while running:
 		if event.type == pygame.QUIT:
 			running = False
 
-	clock.tick(30)
+	# Limit fps
+	clock.tick(60)
+
+	# Draw a black background
 	screen.fill((0, 0, 0))
 
-	for y,row in enumerate(all_cells[index]):
+	# Update the color based on the z index
+	color = colors[index].rgb
+
+	# Draw each cell in the current z index
+	for y,row in enumerate(fields[index]):
+		if y >= size_y - 1:
+			continue
 		for x,cell in enumerate(row):
+			if x >= size_x - 1:
+				continue
 			draw_cell(
-				cell=cell,
+				cell=[
+					convert(row[x], threshold=threshold),
+					convert(row[x+1], threshold=threshold),
+					convert(fields[index][y+1][x+1], threshold=threshold),
+					convert(fields[index][y+1][x], threshold=threshold)
+				],
 				position=(int(width/size_x/2 + x*width/size_x), int(height/size_y/2 + y*height/size_y)),
-				color=colors[index].rgb
+				color=(int(color[0] * 255), int(color[1] * 255), int(color[2] * 255))
 			)
 
+	# Cycle through the z indices
 	index += 1
-	if index >= len(all_cells):
+	if index >= len(fields):
 		index = 0
 
 	pygame.display.flip()
