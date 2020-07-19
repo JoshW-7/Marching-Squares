@@ -132,7 +132,7 @@ def draw_cell(cell=[0, 0, 0, 0], position=(0, 0), color=(255, 255, 255), thresho
 		14: ((-1, -1), (1, -1), (1, 1), (0, 1), (-1, 0)),
 		15: ((-1, -1), (1, -1), (1, 1), (-1, 1)),
 	}.get(state, ())
-	
+
 	x_offset = width/size_x/2
 	y_offset = height/size_y/2
 
@@ -175,7 +175,7 @@ size_z = 100
 threshold = 0
 
 # Generate 3D Perlin Noise
-fields = generate_perlin_noise_3d((size_x, size_y, size_z), (5, 5, 5))
+fields = generate_perlin_noise_3d((size_x, size_y, size_z), (1, 5, 5))
 
 view_x = 0
 view_y = 0
@@ -184,6 +184,8 @@ clock = pygame.time.Clock()
 running = True
 counter = 0
 index = 0
+player_x = 20
+player_y = 20
 while running:
 	for event in pygame.event.get():
 		if event.type == pygame.QUIT:
@@ -194,6 +196,33 @@ while running:
 
 	# Draw a black background
 	screen.fill((0, 0, 0))
+
+	# Deform terrain on mouse over
+	mouse_x, mouse_y = pygame.mouse.get_pos()
+	grid_x = int(mouse_x / (width / size_x))
+	grid_y = int(mouse_y / (height / size_y))
+	if 0 <= grid_x < size_x and 0 <= grid_y < size_y:
+		for y in range(grid_y - 10, grid_y + 10):
+			for x in range(grid_x - 10, grid_x + 10):
+				if x < size_x and y < size_y:
+					fields[index][y][x] = 0
+
+	# Move player
+	if pygame.key.get_pressed()[pygame.K_RIGHT]:
+		player_x += 1
+	if pygame.key.get_pressed()[pygame.K_LEFT]:
+		player_x -= 1
+	if pygame.key.get_pressed()[pygame.K_UP]:
+		player_y -= 1
+	if pygame.key.get_pressed()[pygame.K_DOWN]:
+		player_y += 1
+
+	# Deform terrain under player
+	if 0 <= player_x < size_x and 0 <= player_y < size_y:
+		for y in range(player_y, player_y + 5):
+			for x in range(player_x, player_x + 5):
+				if x < size_x and y < size_y:
+					fields[index][y][x] = 0
 
 	# Update the color based on the z index
 	color = colors[index].rgb
@@ -215,6 +244,10 @@ while running:
 				position=(int(width/size_x/2 + x*width/size_x), int(height/size_y/2 + y*height/size_y)),
 				color=(int(color[0] * 255), int(color[1] * 255), int(color[2] * 255))
 			)
+
+	# Draw the player
+	pygame.draw.rect(screen, (255, 255, 255), (player_x*(width/size_x), player_y*(height/size_y), 4*width/size_x, 4*height/size_y))
+	
 
 	# Cycle through the z indices
 	index += 1
