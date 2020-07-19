@@ -11,3 +11,7 @@ Example with slightly higher distribution threshold (0.2):
 Example with slightly lower distribution threshold (-0.2):
 
 ![](example_thresh_lower.gif)
+
+And here's some terrain deformation. I think making a snake-type game out of this might be fun at some point:
+
+![](example_terrain_deformation.gif)
