@@ -22,6 +22,6 @@ And here's some terrain deformation. I think making a snake-type game out of thi
 
 Also...I can't help but think of this simulation of quantum fluctuations after staring at these for a while. So here it is:
 
-![](quantum_fluctuation.gif)
+![](quantum_fluctuations.gif)
 
 https://en.wikipedia.org/wiki/Quantum_fluctuation
