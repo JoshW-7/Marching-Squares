@@ -2,7 +2,7 @@
 
 Playing with colors:
 
-![](example_pretty.gif)
+![](example_pretty2.gif)
 
 Example with even distribution threshold (0.0): 
 
