@@ -55,7 +55,7 @@ def get_state(cell):
 	return cell[0] * 8 + cell[1] * 4 + cell[2] * 2 + cell[3]
 
 
-def convert(value, threshold=0.2):
+def convert(value, threshold=-0.2):
 	if value > threshold:
 		return 1
 	else:
