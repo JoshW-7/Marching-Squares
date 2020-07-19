@@ -65,7 +65,12 @@ def convert(value, threshold=0.2):
 def draw_cell(cell=[0, 0, 0, 0], position=(0, 0), color=(255, 255, 255), threshold=0):
 	global view_x, view_y
 
-	state = get_state(cell)
+	state = get_state([
+		convert(cell[0], threshold=threshold),
+		convert(cell[1], threshold=threshold),
+		convert(cell[2], threshold=threshold),
+		convert(cell[3], threshold=threshold)
+	])
 
 	lines = {
 		1: [
@@ -169,13 +174,13 @@ height = 500
 screen = pygame.display.set_mode([width, height])
 
 # Options
-size_x = 100
-size_y = 100
-size_z = 100
+size_x = 50
+size_y = 50
+size_z = 50
 threshold = 0
 
 # Generate 3D Perlin Noise
-fields = generate_perlin_noise_3d((size_x, size_y, size_z), (1, 5, 5))
+fields = generate_perlin_noise_3d((size_x, size_y, size_z), (5, 5, 5))
 
 view_x = 0
 view_y = 0
@@ -184,6 +189,7 @@ clock = pygame.time.Clock()
 running = True
 counter = 0
 index = 0
+color_index = 0
 player_x = 20
 player_y = 20
 while running:
@@ -198,6 +204,7 @@ while running:
 	screen.fill((0, 0, 0))
 
 	# Deform terrain on mouse over
+	"""
 	mouse_x, mouse_y = pygame.mouse.get_pos()
 	grid_x = int(mouse_x / (width / size_x))
 	grid_y = int(mouse_y / (height / size_y))
@@ -223,12 +230,14 @@ while running:
 			for x in range(player_x, player_x + 5):
 				if x < size_x and y < size_y:
 					fields[index][y][x] = 0
-
-	# Update the color based on the z index
-	color = colors[index].rgb
+	"""
 
 	# Draw each cell in the current z index
 	for y,row in enumerate(fields[index]):
+		color = colors[color_index].rgb
+		color_index += 1
+		if color_index >= size_z:
+			color_index = 0
 		if y >= size_y - 1:
 			continue
 		for x,cell in enumerate(row):
@@ -236,19 +245,18 @@ while running:
 				continue
 			draw_cell(
 				cell=[
-					convert(row[x], threshold=threshold),
-					convert(row[x+1], threshold=threshold),
-					convert(fields[index][y+1][x+1], threshold=threshold),
-					convert(fields[index][y+1][x], threshold=threshold)
+					row[x],
+					row[x+1],
+					fields[index][y+1][x+1],
+					fields[index][y+1][x]
 				],
 				position=(int(width/size_x/2 + x*width/size_x), int(height/size_y/2 + y*height/size_y)),
 				color=(int(color[0] * 255), int(color[1] * 255), int(color[2] * 255))
 			)
 
 	# Draw the player
-	pygame.draw.rect(screen, (255, 255, 255), (player_x*(width/size_x), player_y*(height/size_y), 4*width/size_x, 4*height/size_y))
+	# pygame.draw.rect(screen, (255, 255, 255), (player_x*(width/size_x), player_y*(height/size_y), 4*width/size_x, 4*height/size_y))
 	
-
 	# Cycle through the z indices
 	index += 1
 	if index >= len(fields):
