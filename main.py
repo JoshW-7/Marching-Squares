@@ -2,7 +2,6 @@ import noise
 import numpy as np
 import pygame
 
-from numpy import interp
 from colour import Color
 
 
@@ -146,46 +145,6 @@ def draw_cell(cell=[0, 0, 0, 0], position=(0, 0), color=(255, 255, 255), thresho
 
 	# Draw the border for this cell
 	for i,line in enumerate(lines):
-		"""
-		for n,point in enumerate(line):
-			offset = {
-				(-1, 0): (
-					0,
-					interp(cell[0] + (cell[3]-cell[0])/2, [cell[0], cell[3]], [-1, 1]),
-				),
-				(-1, -1): (
-					interp(cell[0] + (cell[1]-cell[0])/2, [cell[0], cell[1]], [-1, 1]),
-					interp(cell[0] + (cell[3]-cell[0])/2, [cell[0], cell[3]], [-1, 1])
-				),
-				(0, -1): (
-					interp(cell[0] + (cell[1]-cell[0])/2, [cell[0], cell[1]], [-1, 1]),
-					0,
-				),
-				(1, -1): (
-					interp(cell[0] + (cell[1]-cell[0])/2, [cell[0], cell[1]], [-1, 1]),
-					interp(cell[1] + (cell[2]-cell[1])/2, [cell[1], cell[2]], [-1, 1])
-				),
-				(1, 0): (
-					0,
-					interp(cell[1] + (cell[2]-cell[1])/2, [cell[1], cell[2]], [-1, 1]),
-				),
-				(1, 1): (
-					interp(cell[2] + (cell[3]-cell[2])/2, [cell[2], cell[3]], [-1, 1]),
-					interp(cell[1] + (cell[2]-cell[1])/2, [cell[1], cell[2]], [-1, 1])
-				),
-				(0, 1): (
-					interp(cell[2] + (cell[3]-cell[2])/2, [cell[2], cell[3]], [-1, 1]),
-					0,
-				),
-				(-1, 1): (
-					interp(cell[2] + (cell[3]-cell[2])/2, [cell[2], cell[3]], [-1, 1]),
-					interp(cell[1] + (cell[2]-cell[1])/2, [cell[1], cell[2]], [-1, 1])
-				),
-			}.get(point)
-
-			line[i] = (point[0] + offset[0], point[1] + offset[1])
-		"""
-
 		start = [
 			int(view_x + position[0] + line[0][0]*x_offset),
 			int(view_y + position[1] + line[0][1]*y_offset)
