@@ -55,22 +55,15 @@ def get_state(cell):
 	return cell[0] * 8 + cell[1] * 4 + cell[2] * 2 + cell[3]
 
 
-def convert(value, threshold=0.2):
-	if value > threshold:
-		return 1
-	else:
-		return 0
-
-
 def draw_cell(cell=[0, 0, 0, 0], position=(0, 0), color=(255, 255, 255), threshold=0):
 	global view_x, view_y
 
 	# Get the state of this cell by passing in 1's or 0's for each corner
 	state = get_state([
-		convert(cell[0], threshold=threshold),
-		convert(cell[1], threshold=threshold),
-		convert(cell[2], threshold=threshold),
-		convert(cell[3], threshold=threshold)
+		1 if cell[0] > threshold else 0,
+		1 if cell[1] > threshold else 0,
+		1 if cell[2] > threshold else 0,
+		1 if cell[3] > threshold else 0,
 	])
 
 	# Get the lines to be drawn for this cell based on state
@@ -144,7 +137,7 @@ def draw_cell(cell=[0, 0, 0, 0], position=(0, 0), color=(255, 255, 255), thresho
 	y_offset = height/size_y/2
 
 	# Draw the border for this cell
-	for i,line in enumerate(lines):
+	for line in lines:
 		start = [
 			int(view_x + position[0] + line[0][0]*x_offset),
 			int(view_y + position[1] + line[0][1]*y_offset)
