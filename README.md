@@ -4,17 +4,9 @@ Playing with colors:
 
 ![](example_pretty.gif)
 
-Example with even distribution threshold (0.0): 
+Here's a version with weighted colors based on the average of each cell's corners:
 
-![](example.gif)
-
-Example with slightly higher distribution threshold (0.2):
-
-![](example_thresh_higher.gif)
-
-Example with slightly lower distribution threshold (-0.2):
-
-![](example_thresh_lower.gif)
+![](example_soft_colors.gif)
 
 And here's some terrain deformation. I think making a snake-type game out of this might be fun at some point:
 
