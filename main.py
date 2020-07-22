@@ -136,6 +136,9 @@ def draw_cell(cell=[0, 0, 0, 0], position=(0, 0), color=(255, 255, 255), thresho
 	x_offset = width/size_x/2
 	y_offset = height/size_y/2
 
+	# Take the average value of this cell's corners to weight the fill color
+	weight = (cell[0] + cell[1] + cell[2] + cell[3]) / 4
+
 	# Draw the border for this cell
 	for line in lines:
 		start = [
@@ -146,7 +149,7 @@ def draw_cell(cell=[0, 0, 0, 0], position=(0, 0), color=(255, 255, 255), thresho
 			int(view_x + position[0] + line[1][0]*x_offset),
 			int(view_y + position[1] + line[1][1]*y_offset)
 		]
-		pygame.draw.line(screen, (255, 255, 255), start, end, 4)
+		# pygame.draw.line(screen, (255, 255, 255), start, end, 4)
 
 	# Fill in the solid area of this cell
 	points = [[
@@ -154,7 +157,17 @@ def draw_cell(cell=[0, 0, 0, 0], position=(0, 0), color=(255, 255, 255), thresho
 		int(view_y + position[1] + point[1]*y_offset)
 	] for point in polygon]
 	if len(points) > 0:
-		pygame.draw.polygon(screen, color, points)
+		if weight > 0:
+			# Determine color amplitude based on the weight
+			color = ( int(1.2*color[0]*weight), int(1.2*color[1]*weight), int(1.2*color[2]*weight) )
+			r,g,b = color
+			if r > 255:
+				color[0] = 255
+			if g > 255:
+				color[1] = 255
+			if b > 255:
+				color[2] = 255
+			pygame.draw.polygon(screen, color, points)
 
 
 # Initialization
@@ -164,13 +177,13 @@ height = 500
 screen = pygame.display.set_mode([width, height])
 
 # Options
-size_x = 50
-size_y = 50
-size_z = 50
+size_x = 60
+size_y = 60
+size_z = 60
 threshold = 0
 
 # Generate 3D Perlin Noise
-fields = generate_perlin_noise_3d((size_x, size_y, size_z), (2, 2, 2))
+fields = generate_perlin_noise_3d((size_x, size_y, size_z), (5, 5, 5))
 
 view_x = 0
 view_y = 0
@@ -241,7 +254,7 @@ while running:
 					fields[index][y+1][x]
 				],
 				position=(int(width/size_x/2 + x*width/size_x), int(height/size_y/2 + y*height/size_y)),
-				color=(int(color[0] * 255), int(color[1] * 255), int(color[2] * 255))
+				color=(int(color[0] * 255), int(color[1] * 255), int(color[2] * 255)),
 			)
 
 	# Draw the player
