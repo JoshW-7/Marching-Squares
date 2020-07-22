@@ -4,7 +4,7 @@ Playing with colors:
 
 ![](example_pretty.gif)
 
-Here's a version with weighted colors based on the average of each cell's corners:
+Here's a version with weighted colors based on the average of each cell's corners (it actually looks a bit smoother but the gif has some quality loss):
 
 ![](example_very_soft.gif)
 
