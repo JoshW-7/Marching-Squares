@@ -4,6 +4,8 @@ import pygame
 
 from colour import Color
 
+# Examples located in root of this repository
+
 
 # Function code from https://github.com/pvigier/perlin-numpy
 def generate_perlin_noise_3d(shape, res):

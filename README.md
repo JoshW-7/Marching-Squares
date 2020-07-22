@@ -6,7 +6,7 @@ Playing with colors:
 
 Here's a version with weighted colors based on the average of each cell's corners:
 
-![](example_soft_colors.gif)
+![](example_very_soft.gif)
 
 And here's some terrain deformation. I think making a snake-type game out of this might be fun at some point:
 
