@@ -177,13 +177,13 @@ height = 500
 screen = pygame.display.set_mode([width, height])
 
 # Options
-size_x = 60
-size_y = 60
-size_z = 60
+size_x = 90
+size_y = 90
+size_z = 90
 threshold = 0
 
 # Generate 3D Perlin Noise
-fields = generate_perlin_noise_3d((size_x, size_y, size_z), (5, 5, 5))
+fields = generate_perlin_noise_3d((size_x, size_y, size_z), (2, 2, 2))
 
 view_x = 0
 view_y = 0
