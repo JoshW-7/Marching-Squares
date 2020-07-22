@@ -159,7 +159,7 @@ def draw_cell(cell=[0, 0, 0, 0], position=(0, 0), color=(255, 255, 255), thresho
 	if len(points) > 0:
 		if weight > 0:
 			# Determine color amplitude based on the weight
-			color = ( int(1.2*color[0]*weight), int(1.2*color[1]*weight), int(1.2*color[2]*weight) )
+			color = [ int(1.8*color[0]*weight), int(1.8*color[1]*weight), int(1.8*color[2]*weight) ]
 			r,g,b = color
 			if r > 255:
 				color[0] = 255
